@@ -1,17 +1,8 @@
-// @flow
+const cumulativeRafSchd = fn => {
+  let lastArgs = [];
+  let frameId = null;
 
-type WrapperFn<T> = {
-  [[call]]: (...T) => void,
-  cancel: () => void,
-};
-
-const rafSchd = <T: $ReadOnlyArray<any>>(
-  fn: (...T) => void,
-): WrapperFn<T> => {
-  let lastArgs: T = ([]: any);
-  let frameId: ?AnimationFrameID = null;
-
-  const wrapperFn: WrapperFn<T> = (...args: T) => {
+  const wrapperFn = (...args) => {
     // Always capture the latest value
     lastArgs = args;
 
@@ -40,4 +31,4 @@ const rafSchd = <T: $ReadOnlyArray<any>>(
   return wrapperFn;
 };
 
-export default rafSchd;
+export default cumulativeRafSchd;
