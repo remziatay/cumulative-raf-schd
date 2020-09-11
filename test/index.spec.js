@@ -186,3 +186,95 @@ describe('respecting original "this" context', () => {
     expect(() => requestAnimationFrame.step()).toThrow();
   });
 });
+
+describe("cumulative behaviour", () => {
+  it("should not accumulate when config is undefined", () => {
+    const myMock = jest.fn();
+    const fn = rafSchedule(myMock);
+
+    fn(1);
+    fn(2);
+    fn(3);
+    fn(4);
+
+    requestAnimationFrame.step();
+
+    expect(myMock).toHaveBeenCalledTimes(1);
+    expect(myMock.mock.calls[0]).toEqual([4]);
+  });
+
+  it("should accumulate when config is truthy", () => {
+    const myMock = jest.fn();
+    const fn = rafSchedule(myMock, [true]);
+
+    fn(1);
+    fn(2);
+    fn(3);
+    fn(4);
+
+    requestAnimationFrame.step();
+
+    expect(myMock).toHaveBeenCalledTimes(1);
+    expect(myMock.mock.calls[0]).toEqual([1 + 2 + 3 + 4]);
+  });
+
+  it("should accumulate according to config function", () => {
+    const myMock = jest.fn();
+    const fn = rafSchedule(myMock, [(acc, val) => acc * val]);
+
+    fn(1);
+    fn(2);
+    fn(3);
+    fn(4);
+
+    requestAnimationFrame.step();
+
+    expect(myMock).toHaveBeenCalledTimes(1);
+    expect(myMock.mock.calls[0]).toEqual([1 * 2 * 3 * 4]);
+  });
+
+  it("should respect different accumulative options", () => {
+    const myMock = jest.fn();
+    const fn = rafSchedule(myMock, [false, true]);
+
+    fn(1, 1);
+    fn(2, 2);
+    fn(3, 3);
+    fn(4, 4);
+
+    requestAnimationFrame.step();
+
+    expect(myMock).toHaveBeenCalledTimes(1);
+    expect(myMock.mock.calls[0]).toEqual([4, 1 + 2 + 3 + 4]);
+  });
+
+  it("should treat empty slots as falsy", () => {
+    const myMock = jest.fn();
+    const fn = rafSchedule(myMock, [, true]);
+
+    fn(1, 1, 1);
+    fn(2, 2, 2);
+    fn(3, 3, 3);
+    fn(4, 4, 4);
+
+    requestAnimationFrame.step();
+
+    expect(myMock).toHaveBeenCalledTimes(1);
+    expect(myMock.mock.calls[0]).toEqual([4, 1 + 2 + 3 + 4, 4]);
+  });
+
+  it("should also accept single argument instead of array", () => {
+    const myMock = jest.fn();
+    const fn = rafSchedule(myMock, (acc, val) => acc - val);
+
+    fn(1, 1);
+    fn(2, 2);
+    fn(3, 3);
+    fn(4, 4);
+
+    requestAnimationFrame.step();
+
+    expect(myMock).toHaveBeenCalledTimes(1);
+    expect(myMock.mock.calls[0]).toEqual([1 - 2 - 3 - 4, 4]);
+  });
+});
