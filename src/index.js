@@ -3,6 +3,8 @@ const sum = (a, b) => a + b;
 const cumulativeRafSchd = (fn, config = []) => {
   let lastArgs = [];
   let frameId = null;
+
+  if (!Array.isArray(config)) config = [config];
   config = Array.from(config, func =>
     func && typeof func !== "function" ? sum : func
   );
