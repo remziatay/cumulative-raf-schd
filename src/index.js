@@ -1,8 +1,18 @@
-const cumulativeRafSchd = fn => {
+const sum = (a, b) => a + b;
+
+const cumulativeRafSchd = (fn, config = []) => {
   let lastArgs = [];
   let frameId = null;
+  config = Array.from(config, func =>
+    func && typeof func !== "function" ? sum : func
+  );
 
   const wrapperFn = (...args) => {
+    config.forEach((func, i) => {
+      if (func && lastArgs[i] !== undefined)
+        args[i] = func(lastArgs[i], args[i]);
+    });
+
     // Always capture the latest value
     lastArgs = args;
 
