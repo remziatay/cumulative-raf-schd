@@ -1,12 +1,12 @@
 const sum = (a, b) => a + b;
 
-const cumulativeRafSchd = (fn, config = []) => {
+const cumulativeRafSchd = (fn, config = [], defaultAccumulator = sum) => {
   let lastArgs = [];
   let frameId = null;
 
   if (!Array.isArray(config)) config = [config];
   config = Array.from(config, func =>
-    func && typeof func !== "function" ? sum : func
+    func && typeof func !== "function" ? defaultAccumulator : func
   );
 
   const wrapperFn = (...args) => {
@@ -15,26 +15,22 @@ const cumulativeRafSchd = (fn, config = []) => {
         args[i] = func(lastArgs[i], args[i]);
     });
 
-    // Always capture the latest value
-    lastArgs = args;
+    lastArgs = args; // Always capture the latest value
 
-    // There is already a frame queued
-    if (frameId) {
-      return;
-    }
+    if (frameId) return; // There is already a frame queued
 
     // Schedule a new frame
     frameId = requestAnimationFrame(() => {
       frameId = null;
-      fn(...lastArgs);
+      const newArgs = [...lastArgs]
+      lastArgs = []
+      fn(...newArgs);
     });
   };
 
   // Adding cancel property to result function
   wrapperFn.cancel = () => {
-    if (!frameId) {
-      return;
-    }
+    if (!frameId) return;
 
     cancelAnimationFrame(frameId);
     frameId = null;

@@ -277,4 +277,37 @@ describe("cumulative behaviour", () => {
     expect(myMock).toHaveBeenCalledTimes(1);
     expect(myMock.mock.calls[0]).toEqual([1 - 2 - 3 - 4, 4]);
   });
+
+  it("should apply default accumulator if given", () => {
+    const myMock = jest.fn();
+    const fn = rafSchedule(myMock, [false, true], (acc, val) => acc * val);
+
+    fn(1, 1);
+    fn(2, 2);
+    fn(3, 3);
+    fn(4, 4);
+
+    requestAnimationFrame.step();
+
+    expect(myMock).toHaveBeenCalledTimes(1);
+    expect(myMock.mock.calls[0]).toEqual([4, 1 * 2 * 3 * 4]);
+  });
+
+  it("should reset accumulator on every frame", () => {
+    const myMock = jest.fn();
+    const fn = rafSchedule(myMock, [, 1]);
+
+    fn(1, 1);
+    fn(2, 2);
+    requestAnimationFrame.step();
+    fn(3, 3);
+    fn(4, 4);
+    requestAnimationFrame.step();
+    
+
+    expect(myMock).toHaveBeenCalledTimes(2);
+    expect(myMock.mock.calls[0]).toEqual([2, 1 + 2]);
+    expect(myMock.mock.calls[1]).toEqual([4, 3 + 4]);
+  });
+
 });
