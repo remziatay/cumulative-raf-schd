@@ -6,11 +6,9 @@
   "module": "dist/cumulative-raf-schd.esm.js",
   "sideEffects": false,
   "files": [
-    "/dist",
-    "/src"
+    "/dist"
   ],
   "author": "Remzi Atay <remziatay47@gmail.com>",
-  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/remziatay/cumulative-raf-schd.git"

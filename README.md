@@ -1,10 +1,20 @@
-# Cumulative raf-schd
+# cumulative-raf-schd
 
-A `throttle` function that is based on [raf-schd](https://github.com/alexreardon/raf-schd). With cumulative raf-schd, it is possible to accumulate function arguments before calling it. It is completely backwards compatible.
+A `throttle` function based on [raf-schd](https://github.com/alexreardon/raf-schd). With cumulative-raf-schd, it is possible to accumulate function arguments before execution. It is compatible with raf-schd.
+
+[![NPM](https://img.shields.io/npm/v/cumulative-raf-schd.svg)](https://www.npmjs.com/package/cumulative-raf-schd)
+
+### Install
+
+```bash
+npm install --save cumulative-raf-schd
+```
 
 ### Usage
 
 ```js
+import cumulativeRafSchd from "cumulative-raf-schd";
+
 const expensiveFn = (...args) => {
   //...
   console.log(args);
